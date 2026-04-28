@@ -1,44 +1,59 @@
 <?php
 
-namespace RioSlum\HiringTest\Core;
+declare(strict_types=1);
 
-use RioSlum\HiringTest\Facades\Str;
+namespace RioSlum\HiringTest\Core;
 
 class ValidateContacts
 {
-
-    private int $valid = 0;
-    private int $invalid = 0;
-
     public function handle(array $contacts): array
     {
-        $newContacts = [];
-         $contacts = array_map(function (array $contact) {
-            $email = trim(mb_strtolower($contact['email']));
-            return [
-                ...$contact,
-                'email' => $email,
+        $validContacts = [];
+        $skippedContacts = [];
 
-            ];
-        }, $contacts);
+        foreach ($contacts as $contact) {
+            if (!is_array($contact)) {
+                $skippedContacts[] = [
+                    'contact' => $contact,
+                    'reason' => 'invalid_contact_format',
+                ];
 
-         foreach ($contacts as $contact) {
-             if(!$contact['email'] || !filter_var($contact['email'], FILTER_VALIDATE_EMAIL)) {
-                 $this->invalid++;
-             }
-             else{
-                 $this->valid++;
-                 $newContacts[] = $contact;
-             }
-         }
+                continue;
+            }
+
+            $contact = $this->normalize($contact);
+
+            if (!$this->hasValidEmail($contact)) {
+                $skippedContacts[] = [
+                    'contact' => $contact,
+                    'reason' => 'invalid_email',
+                ];
+
+                continue;
+            }
+
+            $validContacts[] = $contact;
+        }
 
         return [
-            'valid' => $this->valid,
-            'invalid' => $this->invalid,
-            'contacts' => $newContacts
+            'valid' => count($validContacts),
+            'invalid' => count($skippedContacts),
+            'contacts' => $validContacts,
+            'skipped' => $skippedContacts,
         ];
     }
 
+    private function normalize(array $contact): array
+    {
+        return [
+            ...$contact,
+            'email' => trim(mb_strtolower((string) ($contact['email'] ?? ''))),
+        ];
+    }
 
-
+    private function hasValidEmail(array $contact): bool
+    {
+        return $contact['email'] !== ''
+            && filter_var($contact['email'], FILTER_VALIDATE_EMAIL) !== false;
+    }
 }

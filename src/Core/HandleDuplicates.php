@@ -1,18 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace RioSlum\HiringTest\Core;
 
 class HandleDuplicates
 {
-
-    private int $duplicates = 0;
-
-    /**
-     * @throws \Exception
-     */
-    public function handle(array $contacts)
+    public function handle(array $contacts): array
     {
-
+        $duplicates = 0;
         $uniqueContacts = [];
 
         foreach ($contacts as $contact) {
@@ -24,19 +20,19 @@ class HandleDuplicates
             }
 
             $uniqueContacts[$email] = $this->bestContact($uniqueContacts[$email], $contact);
-            $this->duplicates++;
+            $duplicates++;
         }
 
         return [
-            'duplicates' => $this->duplicates,
+            'duplicates' => $duplicates,
             'contacts' => array_values($uniqueContacts),
         ];
     }
 
-    private function bestContact(array $incomingContact, array $newContact)
+    private function bestContact(array $incomingContact, array $newContact): array
     {
         if ($incomingContact['email'] !== $newContact['email']) {
-            throw new \Exception(message: 'The emails need to be equal');
+            throw new \InvalidArgumentException('Duplicate contacts must have the same email.');
         }
 
         $bestContact = $incomingContact;
@@ -105,6 +101,4 @@ class HandleDuplicates
     {
         return $value === null || $value === '';
     }
-
-
 }
