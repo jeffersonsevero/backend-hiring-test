@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace RioSlum\HiringTest\Core;
 
@@ -8,7 +8,7 @@ class HandleDuplicates
 {
     public function handle(array $contacts): array
     {
-        $duplicates = 0;
+        $duplicates     = 0;
         $uniqueContacts = [];
 
         foreach ($contacts as $contact) {
@@ -16,6 +16,7 @@ class HandleDuplicates
 
             if (!isset($uniqueContacts[$email])) {
                 $uniqueContacts[$email] = $contact;
+
                 continue;
             }
 
@@ -25,7 +26,7 @@ class HandleDuplicates
 
         return [
             'duplicates' => $duplicates,
-            'contacts' => array_values($uniqueContacts),
+            'contacts'   => array_values($uniqueContacts),
         ];
     }
 
@@ -68,7 +69,7 @@ class HandleDuplicates
     private function pickBestState(mixed $currentValue, mixed $newValue): mixed
     {
         $currentIsStateCode = $this->isTwoLetterStateCode($currentValue);
-        $newIsStateCode = $this->isTwoLetterStateCode($newValue);
+        $newIsStateCode     = $this->isTwoLetterStateCode($newValue);
 
         if ($currentIsStateCode && !$newIsStateCode) {
             return $currentValue;

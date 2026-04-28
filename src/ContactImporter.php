@@ -1,17 +1,17 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace RioSlum\HiringTest;
 
-use RioSlum\HiringTest\Core\HandleDuplicates;
-use RioSlum\HiringTest\Core\ValidateContacts;
 use JsonException;
+use RioSlum\HiringTest\Core\{HandleDuplicates, ValidateContacts};
 use RuntimeException;
 
 class ContactImporter
 {
     private ValidateContacts $validator;
+
     private HandleDuplicates $deduplicator;
 
     public function __construct(
@@ -21,23 +21,23 @@ class ContactImporter
         ?ValidateContacts $validator = null,
         ?HandleDuplicates $deduplicator = null,
     ) {
-        $this->validator = $validator ?? new ValidateContacts();
+        $this->validator    = $validator ?? new ValidateContacts();
         $this->deduplicator = $deduplicator ?? new HandleDuplicates();
     }
 
     public function run(string $inputPath, string $outputPath): array
     {
         $contacts = $this->readContacts($inputPath);
-        $result = $this->emptyResult();
+        $result   = $this->emptyResult();
 
         $result['summary']['total_records'] = count($contacts);
 
-        $validation = $this->validator->handle($contacts);
-        $result['summary']['valid_records'] = $validation['valid'];
+        $validation                           = $this->validator->handle($contacts);
+        $result['summary']['valid_records']   = $validation['valid'];
         $result['summary']['invalid_records'] = $validation['invalid'];
-        $result['skipped'] = $validation['skipped'];
+        $result['skipped']                    = $validation['skipped'];
 
-        $deduplication = $this->deduplicator->handle($validation['contacts']);
+        $deduplication                          = $this->deduplicator->handle($validation['contacts']);
         $result['summary']['duplicates_merged'] = $deduplication['duplicates'];
 
         $this->importContacts($deduplication['contacts'], $result);
@@ -57,13 +57,14 @@ class ContactImporter
                 if ($import['success']) {
                     $result['summary']['successful_imports']++;
                     $result['imported'][] = $contact;
+
                     continue;
                 }
 
                 $result['summary']['failed_imports']++;
                 $result['failed'][] = [
-                    'contact' => $contact,
-                    'reason' => $import['reason'],
+                    'contact'  => $contact,
+                    'reason'   => $import['reason'],
                     'attempts' => $import['attempts'],
                     'response' => $import['response'],
                 ];
@@ -81,9 +82,9 @@ class ContactImporter
 
             if ($response['success'] === true) {
                 return [
-                    'success' => true,
+                    'success'  => true,
                     'attempts' => $attempt,
-                    'contact' => $contact,
+                    'contact'  => $contact,
                     'response' => $response,
                 ];
             }
@@ -92,11 +93,11 @@ class ContactImporter
 
             if ($status === 400) {
                 return [
-                    'success' => false,
+                    'success'  => false,
                     'attempts' => $attempt,
-                    'contact' => $contact,
+                    'contact'  => $contact,
                     'response' => $response,
-                    'reason' => 'permanent failure',
+                    'reason'   => 'permanent failure',
                 ];
             }
 
@@ -107,6 +108,7 @@ class ContactImporter
 
                 $retryAfter = max(0, (int) ($response['retry_after'] ?? 1));
                 sleep($retryAfter);
+
                 continue;
             }
 
@@ -115,23 +117,25 @@ class ContactImporter
                     break;
                 }
                 sleep(1);
+
                 continue;
             }
+
             return [
-                'success' => false,
+                'success'  => false,
                 'attempts' => $attempt,
-                'contact' => $contact,
+                'contact'  => $contact,
                 'response' => $response,
-                'reason' => 'unexpected_failure',
+                'reason'   => 'unexpected_failure',
             ];
         }
 
         return [
-            'success' => false,
+            'success'  => false,
             'attempts' => $attempt,
-            'contact' => $contact,
+            'contact'  => $contact,
             'response' => $response ?? null,
-            'reason' => 'max_retries_exceeded',
+            'reason'   => 'max_retries_exceeded',
         ];
     }
 
@@ -182,17 +186,17 @@ class ContactImporter
     {
         return [
             'summary' => [
-                'total_records' => 0,
-                'valid_records' => 0,
-                'invalid_records' => 0,
-                'duplicates_merged' => 0,
-                'attempted_imports' => 0,
+                'total_records'      => 0,
+                'valid_records'      => 0,
+                'invalid_records'    => 0,
+                'duplicates_merged'  => 0,
+                'attempted_imports'  => 0,
                 'successful_imports' => 0,
-                'failed_imports' => 0,
+                'failed_imports'     => 0,
             ],
             'imported' => [],
-            'failed' => [],
-            'skipped' => [],
+            'failed'   => [],
+            'skipped'  => [],
         ];
     }
 }

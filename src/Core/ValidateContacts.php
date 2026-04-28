@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace RioSlum\HiringTest\Core;
 
@@ -8,14 +8,14 @@ class ValidateContacts
 {
     public function handle(array $contacts): array
     {
-        $validContacts = [];
+        $validContacts   = [];
         $skippedContacts = [];
 
         foreach ($contacts as $contact) {
             if (!is_array($contact)) {
                 $skippedContacts[] = [
                     'contact' => $contact,
-                    'reason' => 'invalid_contact_format',
+                    'reason'  => 'invalid_contact_format',
                 ];
 
                 continue;
@@ -26,7 +26,7 @@ class ValidateContacts
             if (!$this->hasValidEmail($contact)) {
                 $skippedContacts[] = [
                     'contact' => $contact,
-                    'reason' => 'invalid_email',
+                    'reason'  => 'invalid_email',
                 ];
 
                 continue;
@@ -36,10 +36,10 @@ class ValidateContacts
         }
 
         return [
-            'valid' => count($validContacts),
-            'invalid' => count($skippedContacts),
+            'valid'    => count($validContacts),
+            'invalid'  => count($skippedContacts),
             'contacts' => $validContacts,
-            'skipped' => $skippedContacts,
+            'skipped'  => $skippedContacts,
         ];
     }
 

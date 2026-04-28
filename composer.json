@@ -16,7 +16,8 @@
   "require-dev": {
     "pestphp/pest": "^4.6",
     "symfony/var-dumper": "^8.0",
-    "rector/rector": "^2.4"
+    "rector/rector": "^2.4",
+    "laravel/pint": "^1.29"
   },
   "config": {
     "allow-plugins": {

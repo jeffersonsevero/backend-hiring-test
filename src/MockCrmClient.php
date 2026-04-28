@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace RioSlum\HiringTest;
 
@@ -22,16 +22,16 @@ class MockCrmClient
         if ($email === '') {
             return [
                 'success' => false,
-                'status' => 400,
-                'error' => 'Missing email',
+                'status'  => 400,
+                'error'   => 'Missing email',
             ];
         }
 
         if (str_contains($email, 'rate.limit')) {
             return [
-                'success' => false,
-                'status' => 429,
-                'error' => 'Rate limit exceeded',
+                'success'     => false,
+                'status'      => 429,
+                'error'       => 'Rate limit exceeded',
                 'retry_after' => 1,
             ];
         }
@@ -39,23 +39,23 @@ class MockCrmClient
         if (str_contains($email, 'temporary.fail')) {
             return [
                 'success' => false,
-                'status' => 500,
-                'error' => 'Temporary CRM error',
+                'status'  => 500,
+                'error'   => 'Temporary CRM error',
             ];
         }
 
         if (str_contains($email, 'invalid.crm')) {
             return [
                 'success' => false,
-                'status' => 400,
-                'error' => 'Invalid contact data',
+                'status'  => 400,
+                'error'   => 'Invalid contact data',
             ];
         }
 
         return [
             'success' => true,
-            'status' => 200,
-            'id' => 'crm_' . substr(md5($email), 0, 10),
+            'status'  => 200,
+            'id'      => 'crm_' . substr(md5($email), 0, 10),
         ];
     }
 }
